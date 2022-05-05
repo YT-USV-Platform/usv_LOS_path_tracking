@@ -1,2 +1,2 @@
 # usv_los_planner
-First 
+Line of Sight path traking method implementation 
