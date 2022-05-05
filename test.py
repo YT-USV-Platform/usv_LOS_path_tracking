@@ -5,8 +5,11 @@ from scipy.interpolate import pchip_interpolate
 import numpy as np
 import math
 
+
 x_observed = np.linspace(0.0, 1.0, 11)
 y_observed = np.sin(x_observed)
+
+#####
 
 x = np.linspace(min(x_observed), max(x_observed), 100)
 y = pchip_interpolate(x_observed, y_observed, x)
@@ -15,8 +18,8 @@ plt.plot(x,y,label='pchip')
 plt.legend()
 
 
-x_current = 0.652
-y_current = 0.345
+x_current = 0.99 # vehicle x-location
+y_current = 0.345 # vehicle y_location
 
 error_list = np.zeros_like(x)
 min_dist = np.inf
@@ -50,9 +53,21 @@ los_angle = math.atan(spline_slope)
 print("Spline slope: ", spline_slope)
 print("LOS angle: ", los_angle)
 
-delta = 0.15
+#delta = 0.15
+### time-varying lookhead distance
+
+delta_min=0.15  #meters
+delta_max=0.3  #meters
+delta_k=50 #design parameters
+
+delta=(delta_max-delta_min)*math.exp(-delta_k*cross_track_error**2)+delta_min
+print('varyin_delta:',delta)
 los_point_x = x_closest + delta * math.cos(los_angle)
 los_point_y = y_closest + delta * math.sin(los_angle)
+
+print('x_los',los_point_x)
+print('y_los',los_point_y)
+
 
 # plot line of sight
 plt.plot([x_closest, los_point_x], [y_closest, los_point_y], 'r--')
@@ -71,17 +86,6 @@ print("Course angle: ", course_angle)
 
 angle_error = course_angle - los_angle
 print("Angle error: ", angle_error)
-
-
-
-
-
-
-
-
-
-
-
 
 
 
