@@ -6,6 +6,8 @@ from scipy.interpolate import pchip_interpolate
 import numpy as np
 import math
 
+from sklearn import cross_decomposition
+
 
 class WayPoint():
 
@@ -25,15 +27,15 @@ class LOSPathTracking:
         self.x_current = x_initial # vehicle x_location
         self.y_current = y_initial # vehicle y_location
 
-
-        self.psi = psi_initial # vehicle heading
-        self.sideslip_angle = sideslip_initial
-        self.course_angle = self.psi + self.sideslip_angle
+        self.get_current_pose(vehicle_x=self.x_current, vehicle_y=self.y_current, vehicle_psi=psi_initial, vehicle_sideslip=sideslip_initial)
         
         print("Psi: ", self.psi)
         print("Sideslip angle: ", self.sideslip_angle)
         print("Course angle: ", self.course_angle)
 
+        self.delta_min = 0.15  # meters
+        self.delta_max = 0.3  # meters
+        self.delta_k = 50 # design parameter
 
 
     # self iptal test
@@ -48,14 +50,30 @@ class LOSPathTracking:
         return x, y
 
 
-    def test_get_current_pose(self):
+    def get_current_pose(self, vehicle_x=None, vehicle_y=None, vehicle_psi=None, vehicle_sideslip=None):
 
-        return self.x_current+0.01, self.y_current+0.01
+        if vehicle_x is None:
+            self.x_current = self.x_current+0.01
+        else:
+            self.x_current = vehicle_x
 
+        if vehicle_y is None:
+            self.y_current = self.y_current+0.01
+        else:
+            self.y_current = vehicle_y
+
+        if vehicle_psi is None:
+            self.psi = self.psi+0.01
+        else:
+            self.psi = vehicle_psi
+
+        if vehicle_sideslip is None:
+            self.sideslip_angle = self.sideslip_angle+0.01
+        else:
+            self.sideslip_angle = vehicle_sideslip
+
+        self.course_angle = vehicle_psi + vehicle_sideslip
     
-    def test_get_current_angle(self):
-
-        return self.psi, self.sideslip_angle, self.course_angle
 
 
     def test_get_path(self):
@@ -69,13 +87,11 @@ class LOSPathTracking:
         return wp_list
 
 
-    def execute(self):
+    def execute(self, vehicle_x, vehicle_y, vehicle_psi, vehicle_sideslip):
 
         self.wp_list = self.test_get_path()
 
-        self.x_current, self.y_current = self.test_get_current_pose()
-
-        self.psi, self.sideslip_angle, self.course_angle = self.test_get_current_angle() 
+        self.get_current_pose(vehicle_x, vehicle_y, vehicle_psi, vehicle_sideslip)
 
         self.x, self.y = self.pchip_interpolation(self.wp_list)
 
@@ -101,11 +117,7 @@ class LOSPathTracking:
         self.los_angle = math.atan(spline_slope)
 
 
-        delta_min = 0.15  # meters
-        delta_max = 0.3  # meters
-        delta_k = 50 # design parameter
-
-        delta = (delta_max-delta_min)*math.exp(-delta_k*cross_track_error**2)+delta_min
+        delta = (self.delta_max-self.delta_min)*math.exp(-1*self.delta_k*cross_track_error**2)+self.delta_min
         print("Varying delta: ", delta)
 
         self.los_point_x = self.x_closest + delta * math.cos(self.los_angle)
@@ -114,12 +126,10 @@ class LOSPathTracking:
         print("Spline slope: ", spline_slope)
         print("LOS angle: ", self.los_angle)
 
-
-
-    def get_angle_error(self):
-
-        angle_error = self.course_angle - self.los_angle
-        print("Angle error: ", angle_error)
+        self.angle_error = self.course_angle - self.los_angle
+        print("Angle error: ", self.angle_error)
+        
+        return self.angle_error, cross_track_error
 
 
 
