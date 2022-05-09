@@ -4,8 +4,8 @@
 
 ## Introduction
 
-*Line of Sight path traking method implementation 
-*DEneme
+* Line of Sight path traking method implementation 
+* DEneme
 
 ```
 print('hello')
