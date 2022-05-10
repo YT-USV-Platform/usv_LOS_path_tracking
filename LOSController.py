@@ -6,8 +6,9 @@ import math
 class LOSController():
 
     def __init__(self, U_max=3.0, U_min=0.0, X_max=math.radians(45.0), Y_max=20.0,
-                       yaw_Kp=0.5,   yaw_Ki=0.0,   yaw_Kd=0.0,   yaw_Kf=0.0):
+                       yaw_Kp=6.5,   yaw_Ki=0.0,   yaw_Kd=0.0,   yaw_Kf=0.0, surge_kf=30.0):
 
+        self.surge_kf = surge_kf
         self.U_max = U_max
         self.U_min = U_min
         self.X_max = X_max
@@ -24,7 +25,6 @@ class LOSController():
     def execute(self, cross_track_error, angle_error, vehicle_yaw):
 
         desired_u = self.get_speed_assignment(cross_track_error, angle_error)
-
         desired_yaw = angle_error + vehicle_yaw
 
 
@@ -33,17 +33,19 @@ class LOSController():
         # self.integral_error += angle_error
 
         control_signal = self.allocate_thrusters(desired_u, yaw_signal)
-
+        
         return control_signal, desired_u, desired_yaw
 
 
 
     def allocate_thrusters(self, surge_signal, yaw_signal):
 
-        left_motor = surge_signal + yaw_signal
-        right_motor = surge_signal - yaw_signal
+        ####### TODO why is this reverse
+        
+        left_motor = surge_signal - yaw_signal
+        right_motor = surge_signal + yaw_signal
 
-        return [left_motor, right_motor]
+        return [self.surge_kf*left_motor, self.surge_kf*right_motor]
 
 
 

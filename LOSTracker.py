@@ -6,7 +6,6 @@ from scipy.interpolate import pchip_interpolate
 import numpy as np
 import math
 
-from sklearn import cross_decomposition
 
 
 class WayPoint():
@@ -78,11 +77,13 @@ class LOSPathTracking:
 
     def test_get_path(self):
 
-        x_list = np.linspace(0.0, 1.0, 11)
+        x_list = np.linspace(0.0, 100.0, 11)
         
         wp_list = []
         for i in range(11):
-            wp_list.append(WayPoint(x_list[i], math.sin(math.radians(180*x_list[i]))))
+            # wp_list.append(WayPoint(x_list[i], math.sin(math.radians(180*x_list[i]))))
+            wp_list.append(WayPoint(x_list[i], 2*x_list[i]))
+
 
         return wp_list
 
@@ -155,7 +156,7 @@ class LOSPathTracking:
         plt.plot(self.los_point_x, self.los_point_y, 'go')
 
         plt.show(block=False)
-        plt.pause(1)
+        plt.pause(0.05)
 
 
 
