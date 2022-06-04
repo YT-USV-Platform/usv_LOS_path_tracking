@@ -73,7 +73,7 @@ class LOSTracking():
             self.var_lookhead_distance=(self.delta_max-self.delta_min)*math.exp(-self.delta_k*y_e**2)+self.delta_min
 
             def integrand(t):
-                return math.sqrt(1+(f(t))**2)   # f matrix takip edilen path'in fonsksiyonudur.
+                return math.sqrt(1+(f(t))**2)   # f : path function
             
             def function(x):
                 return quad(integrand,0,x)[0]-self.var_lookhead_distance
@@ -92,8 +92,8 @@ class LOSTracking():
 
         self.chi_r=math.atan(-y_e/abs(self.var_lookhead_distance)) # los angle 
 
-        self.chi_d=curve_slope_angle+self.chi_r # ref açı
-        error_angle=self.chi_d-eta[5] # açı hatası
+        self.chi_d=curve_slope_angle+self.chi_r       # ref angle
+        error_angle=self.chi_d-eta[5]                 # angle errror
 
         # referans hız değeri
         term1=abs(y_e)/self.y_max
