@@ -5,4 +5,4 @@ In this code we developed a line of sigth path tracking algoritm for otter unmma
 
 - "CubicPathGenerator.py" is written by benefit form Fossen's *"Handbook of Marine Craft Hydrodynamics and Motion"* book chapter 10 *Guidance Systems*.
 
-- In "CubicCurve.py", code of Atsuski is modifed, for getting curve coefficient values matrix. -
+- In "CubicCurve.py", code of Atsuski is modifed, for getting curve coefficient values matrix. 
